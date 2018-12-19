@@ -1,84 +1,109 @@
-<template>
-<form class="is-expanded is-vcentered is-desktop" @submit.prevent = "saveUser" >
-<div class="field">
-  <label class="label">First Name</label>
-  <div class="control">
-    <input class="input" type="text" placeholder="First Name" v-model = "model.user_fname">
-  </div>
-</div>
-<div class="field">
-  <label class="label">Last Name</label>
-  <div class="control">
-    <input class="input" type="text" placeholder="Last Name" v-model = "model.user_lname" >
-  </div>
-</div>
-<div class="field">
-  <label class="label">Role</label>
-  <div class="control">
-    <input class="input" type="text" placeholder="Role" v-model = "model.user_role">
-  </div>
-</div>
-<div class="field">
-  <label class="label">Email</label>
-  <div class="control">
-    <input class="input" type="text" placeholder="Email" v-model = "model.user_email">
-  </div>
-</div>
+<template lang="pug">
+  form.hero(@submit.prevent='saveUser')
+    .hero2
+      h1.title New User
+      .field
+        label.label First Name
+        .control
+          input.input.is-rounded(type='text' placeholder='First Name' v-model='model.user_fname')
+      .field
+        label.label Last Name
+        .control
+          input.input.is-rounded(type='text' placeholder='Last Name' v-model='model.user_lname')
+      .field
+        label.label Role
+        .control
+          .select.is-dark.is-rounded
+            select(type='text' v-model='model.user_role')
+              option(value="" disabled selected :style="{'font-size': '16px'}") Select your option
+              option QA
+              option Infra
+              option Dev
+      .field
+        label.label Email
+        .control
+          input.input.is-rounded(type='text' placeholder='Email' v-model='model.user_email')
+      .buttons.is-right
 
+        button.button.is-warning.is-rounded(@click.prevent='clear()')
+          span
+            i.fas.fa-undo
+            |  Clear
 
-<div class="field is-grouped is-centered" >
-  <div class="control">
-    <button class="button is-success">
-    <span>
-        <i class="fa fa-check"></i>
-        Save User
-    </span>
-    </button>
-  </div>
-  <div class="control">
-
-    <button class="button is-info" @click.prevent="clear()">
-        <span>
-        <i class="fas fa-undo"></i> Clear
-        </span>
-    </button>
-
-  </div>
-</div>
-</form>
-
+        button.button.is-success.is-rounded
+          span
+            i.fa.fa-check
+            |  Save User
+    router-view
 </template>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
+.hero {
+  margin-left: 30%;
+  margin-right: 30%;
+  margin-top: 5%;
+  margin-bottom: 10%;
+  border-radius: 30px;
+  background-color: rgba(245, 89, 89, 0.804);
+}
 
+.hero2 {
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 10%;
+  margin-bottom: 7%;
+}
+
+.control {
+  margin-bottom: 3%;
+}
+
+.label{
+  color: white;
+}
+.title{
+  color: white;
+}
+select{
+  width: 250px !important;
+  border-radius: 50px;
+}
+input[type="text"], select{
+  margin-bottom: 15px;
+  border: 1px solid rgb(65, 65, 65) !important;
+}
 </style>
 
 <script>
 import userService from './userService'
 
 export default {
-data(){
-    return{
-        model: {}
+  data() {
+    return {
+      model: {'user_role': ''}
     }
-},
-
-methods: {
-    async saveUser () {
-        if(!this.model.user_fname || !this.model.user_lname || !this.model.user_email || !this.model.user_role){
-            alert('Please Fill all the text fields')
-        }else{
+  },
+  methods: {
+    async saveUser() {
+      if (!this.model.user_fname || !this.model.user_lname || !this.model.user_email || !this.model.user_role) {
+        alert('Please Fill all the text fields')
+      } else {
         alert(this.model.user_fname + ' ' + this.model.user_lname + ' is Successfuly added')
         await userService.createUser(this.model)
-                this.model = {}
+        this.model = {}
         await this.refreshUsers()
-        }
-        }
-,
-    async clear () {
+      }
+    },
+    async refreshUsers() {
+      this.loading = true
+      this.users = (await userService.getUsers()).data.allUser
+      this.loading = false
+    },
+    async clear() {
       this.model = {}
+      this.model.user_role =''
     }
-}
+  }
 }
 </script>
